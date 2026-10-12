@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import dev.daubney.scrobbled.ui.theme.Wordmark
 
 @Composable
 fun ConnectScreen(vm: ConnectViewModel) {
@@ -25,7 +26,7 @@ fun ConnectScreen(vm: ConnectViewModel) {
         Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp, androidx.compose.ui.Alignment.CenterVertically),
     ) {
-        Text("Scrobbled", style = MaterialTheme.typography.headlineMedium)
+        Wordmark(height = 44.dp)
         Text("Connect to your scrobbling server", color = MaterialTheme.colorScheme.onSurfaceVariant)
         OutlinedTextField(
             s.serverUrl, vm::onServerUrl, Modifier.fillMaxWidth(), singleLine = true,

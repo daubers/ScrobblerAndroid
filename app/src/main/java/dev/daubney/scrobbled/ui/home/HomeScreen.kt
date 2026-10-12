@@ -28,6 +28,7 @@ import dev.daubney.scrobbled.data.history.NowPlaying
 import dev.daubney.scrobbled.data.history.Summary
 import dev.daubney.scrobbled.ui.ScrobbleRow
 import dev.daubney.scrobbled.ui.theme.AppColors
+import dev.daubney.scrobbled.ui.theme.Wordmark
 
 private const val POLL_MS = 15_000L
 
@@ -52,7 +53,7 @@ fun HomeScreen(vm: HomeViewModel, onSettings: () -> Unit) {
     ) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Scrobbled", style = MaterialTheme.typography.headlineSmall)
+                Wordmark(height = 28.dp)
                 TextButton(onSettings) { Text("Settings") }
             }
         }
@@ -76,7 +77,7 @@ fun HomeScreen(vm: HomeViewModel, onSettings: () -> Unit) {
     }
 }
 
-/** The dark "hi-fi front panel" from the web UI, glowing amber while something plays. */
+/** The dark "hi-fi front panel" from the web UI, glowing lime while something plays. */
 @Composable
 private fun NowPlayingPanel(np: NowPlaying?) {
     val panel = AppColors.panel

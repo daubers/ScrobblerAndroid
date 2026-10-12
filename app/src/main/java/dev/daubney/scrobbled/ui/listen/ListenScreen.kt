@@ -88,7 +88,7 @@ private fun Idle(s: ListenState, onListen: () -> Unit) {
     s.error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
 }
 
-/** A big round button in the web UI's amber-on-dark panel style. */
+/** A big round button in the lime-on-dark panel style. */
 @Composable
 private fun ListenButton(onClick: () -> Unit) {
     val panel = AppColors.panel
