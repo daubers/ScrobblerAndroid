@@ -59,6 +59,14 @@ fun HomeScreen(vm: HomeViewModel, onSignOut: () -> Unit) {
         }
         item { NowPlayingPanel(state.nowPlaying) }
         state.summary?.let { item { SummaryRow(it) } }
+        if (state.pending > 0) {
+            item {
+                Text(
+                    if (state.pending == 1) "1 scrobble waiting to send" else "${state.pending} scrobbles waiting to send",
+                    color = Glow, style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
         state.error?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
         if (state.recent.isNotEmpty()) {
             item { Text("Recent", style = MaterialTheme.typography.titleMedium) }

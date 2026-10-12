@@ -3,6 +3,7 @@ package dev.daubney.scrobbled.ui.home
 import dev.daubney.scrobbled.data.history.NowPlaying
 import dev.daubney.scrobbled.ui.FakeHistory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -65,5 +66,16 @@ class HomeViewModelTest {
         vm.refreshNowPlaying()
         assertEquals(playing, vm.state.value.nowPlaying)
         assertNull(vm.state.value.error)
+    }
+
+    @Test
+    fun pendingCountFollowsTheQueue() {
+        val queue = MutableStateFlow(0)
+        val vm = HomeViewModel(FakeHistory(), queue)
+        assertEquals(0, vm.state.value.pending)
+        queue.value = 3
+        assertEquals(3, vm.state.value.pending)
+        queue.value = 0
+        assertEquals(0, vm.state.value.pending)
     }
 }

@@ -6,9 +6,11 @@ import dev.daubney.scrobbled.data.history.HistoryRepository
 import dev.daubney.scrobbled.data.history.NowPlaying
 import dev.daubney.scrobbled.data.history.RecentScrobble
 import dev.daubney.scrobbled.data.history.Summary
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -16,13 +18,22 @@ data class HomeState(
     val nowPlaying: NowPlaying? = null,
     val summary: Summary? = null,
     val recent: List<RecentScrobble> = emptyList(),
+    /** Scrobbles saved on this device that haven't reached the server yet. */
+    val pending: Int = 0,
     val loaded: Boolean = false,
     val error: String? = null,
 )
 
-class HomeViewModel(private val history: HistoryRepository) : ViewModel() {
+class HomeViewModel(
+    private val history: HistoryRepository,
+    pending: Flow<Int> = emptyFlow(),
+) : ViewModel() {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch { pending.collect { n -> _state.update { it.copy(pending = n) } } }
+    }
 
     /** Full refresh: summary, latest scrobbles and now playing. Each part fails independently. */
     fun refresh() {

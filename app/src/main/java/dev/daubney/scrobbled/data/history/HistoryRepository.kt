@@ -29,7 +29,12 @@ class DefaultHistoryRepository(
         try {
             return block(apiFor(creds.serverUrl), creds.bearerToken)
         } catch (e: ApiException) {
-            throw if (e.status == 401) SessionExpiredException() else e
+            throw when (e.status) {
+                401 -> SessionExpiredException()
+                // Transport failures carry raw exception text ("unexpected end of stream on ..."); say it plainly.
+                -1 -> ApiException(-1, null, "Can't reach the server. Check your connection.")
+                else -> e
+            }
         }
     }
 }

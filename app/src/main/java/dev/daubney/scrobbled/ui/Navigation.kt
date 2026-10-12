@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.flow.Flow
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,7 @@ enum class Destination(val route: String, val label: String) {
 }
 
 @Composable
-fun ScrobbledApp(history: HistoryRepository, scrobbles: ScrobbleRepository, trackSearch: TrackSearch, onSignOut: () -> Unit) {
+fun ScrobbledApp(history: HistoryRepository, pending: Flow<Int>, scrobbles: ScrobbleRepository, trackSearch: TrackSearch, onSignOut: () -> Unit) {
     val nav = rememberNavController()
     val current by nav.currentBackStackEntryAsState()
     Scaffold(
@@ -58,7 +59,7 @@ fun ScrobbledApp(history: HistoryRepository, scrobbles: ScrobbleRepository, trac
     ) { padding ->
         NavHost(nav, startDestination = Destination.Home.route, modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
             composable(Destination.Home.route) {
-                val vm = viewModel<HomeViewModel>(factory = viewModelFactory { initializer { HomeViewModel(history) } })
+                val vm = viewModel<HomeViewModel>(factory = viewModelFactory { initializer { HomeViewModel(history, pending) } })
                 HomeScreen(vm, onSignOut)
             }
             composable(Destination.History.route) {

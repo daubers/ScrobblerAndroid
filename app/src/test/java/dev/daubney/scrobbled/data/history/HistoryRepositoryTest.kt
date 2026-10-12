@@ -112,4 +112,12 @@ class HistoryRepositoryTest {
             assertEquals("Kaput", e.message)
         }
     }
+
+    @Test
+    fun unreachableServerGivesPlainMessage() = runTest {
+        server.shutdown()
+        try { repo.summary(); fail() } catch (e: ApiException) {
+            assertEquals("Can't reach the server. Check your connection.", e.message)
+        }
+    }
 }
