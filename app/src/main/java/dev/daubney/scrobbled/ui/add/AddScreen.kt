@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.daubney.scrobbled.data.search.TrackResult
+import dev.daubney.scrobbled.ui.TrackFields
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,10 +98,7 @@ private fun ManualTab(s: AddState, vm: AddViewModel) {
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        val caps = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Next)
-        OutlinedTextField(s.artist, vm::onArtist, Modifier.fillMaxWidth(), singleLine = true, label = { Text("Artist") }, keyboardOptions = caps)
-        OutlinedTextField(s.track, vm::onTrack, Modifier.fillMaxWidth(), singleLine = true, label = { Text("Track") }, keyboardOptions = caps)
-        OutlinedTextField(s.album, vm::onAlbum, Modifier.fillMaxWidth(), singleLine = true, label = { Text("Album (optional)") }, keyboardOptions = caps)
+        TrackFields(s.artist, s.track, s.album, vm::onArtist, vm::onTrack, vm::onAlbum)
         if (s.mbid.isNotEmpty()) {
             Text("Matched on MusicBrainz", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

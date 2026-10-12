@@ -21,6 +21,11 @@ import dev.daubney.scrobbled.data.scrobble.DefaultScrobbleRepository
 import dev.daubney.scrobbled.data.scrobble.ScrobbleRepository
 import dev.daubney.scrobbled.data.search.MusicBrainzSearch
 import dev.daubney.scrobbled.data.search.TrackSearch
+import dev.daubney.scrobbled.data.recognition.AudioRecordRecorder
+import dev.daubney.scrobbled.data.recognition.AudioRecorder
+import dev.daubney.scrobbled.data.recognition.FakeRecognizer
+import dev.daubney.scrobbled.data.recognition.Recognizer
+import dev.daubney.scrobbled.ui.AppServices
 
 /** Hand-rolled service locator; small enough that a DI framework isn't worth it yet. */
 class ScrobbledApplication : Application() {
@@ -32,6 +37,12 @@ class ScrobbledApplication : Application() {
     val queueFlusher by lazy { QueueFlusher(queue, auth) }
     val scrobbles: ScrobbleRepository by lazy { DefaultScrobbleRepository(auth, queue, scheduler) }
     val trackSearch: TrackSearch by lazy { MusicBrainzSearch() }
+    val recorder: AudioRecorder by lazy { AudioRecordRecorder() }
+
+    // TODO: swap for the ACRCloud recognizer once its host/keys are available.
+    val recognizer: Recognizer by lazy { FakeRecognizer() }
+
+    val services by lazy { AppServices(history, queue.observeCount(), scrobbles, trackSearch, recorder, recognizer) }
 
     override fun onCreate() {
         super.onCreate()
