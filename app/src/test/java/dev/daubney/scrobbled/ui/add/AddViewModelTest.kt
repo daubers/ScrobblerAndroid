@@ -2,6 +2,9 @@ package dev.daubney.scrobbled.ui.add
 
 import dev.daubney.scrobbled.data.scrobble.ScrobbleRepository
 import dev.daubney.scrobbled.data.scrobble.TrackDraft
+import dev.daubney.scrobbled.data.search.SearchException
+import dev.daubney.scrobbled.data.search.TrackResult
+import dev.daubney.scrobbled.data.search.TrackSearch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -25,15 +28,27 @@ private class FakeScrobbles : ScrobbleRepository {
     }
 }
 
+private class FakeSearch : TrackSearch {
+    var results = listOf(TrackResult("mb1", "Radiohead", "Reckoner", "In Rainbows", 290))
+    var failure: SearchException? = null
+    val queries = mutableListOf<String>()
+    override suspend fun search(query: String): List<TrackResult> {
+        queries += query
+        failure?.let { throw it }
+        return results
+    }
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddViewModelTest {
     private val now = Instant.parse("2026-10-12T12:00:00Z")
     private val repo = FakeScrobbles()
+    private val search = FakeSearch()
     private lateinit var vm: AddViewModel
 
     @Before fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        vm = AddViewModel(repo) { now }
+        vm = AddViewModel(repo, search) { now }
     }
     @After fun tearDown() = Dispatchers.resetMain()
 
@@ -98,5 +113,72 @@ class AddViewModelTest {
         vm.submit()
         assertEquals(1, repo.submitted.size)
         assertNull(vm.state.value.error)
+    }
+
+    @Test
+    fun searchPopulatesResults() {
+        vm.onQuery("radiohead reckoner")
+        vm.search()
+        assertEquals(listOf("radiohead reckoner"), search.queries)
+        assertEquals(1, vm.state.value.results.size)
+        assertTrue(vm.state.value.searched)
+        assertFalse(vm.state.value.searching)
+    }
+
+    @Test
+    fun blankQueryDoesNotSearch() {
+        vm.onQuery("  ")
+        vm.search()
+        assertEquals(emptyList<String>(), search.queries)
+    }
+
+    @Test
+    fun searchErrorIsShownAndResultsKept() {
+        vm.onQuery("x"); vm.search()
+        search.failure = SearchException("MusicBrainz is busy. Try again in a moment.")
+        vm.search()
+        assertEquals("MusicBrainz is busy. Try again in a moment.", vm.state.value.searchError)
+        assertEquals(1, vm.state.value.results.size)
+        assertFalse(vm.state.value.searching)
+    }
+
+    @Test
+    fun pickingResultFillsFormAndSwitchesToManual() {
+        vm.pick(search.results.single())
+        val s = vm.state.value
+        assertEquals(AddTab.Manual, s.tab)
+        assertEquals("Radiohead", s.artist)
+        assertEquals("In Rainbows", s.album)
+        assertEquals("mb1", s.mbid)
+        assertEquals(290, s.durationSeconds)
+    }
+
+    @Test
+    fun pickedResultSubmitsWithMbidAndDuration() {
+        vm.pick(search.results.single())
+        vm.submit()
+        val d = repo.submitted.single()
+        assertEquals("mb1", d.mbid)
+        assertEquals(290, d.durationSeconds)
+    }
+
+    @Test
+    fun changingArtistOrTrackDropsTheMusicBrainzMatch() {
+        vm.pick(search.results.single())
+        vm.onTrack("Reckoner (live)")
+        assertEquals("", vm.state.value.mbid)
+        assertNull(vm.state.value.durationSeconds)
+        vm.pick(search.results.single())
+        vm.onAlbum("Other album") // album tweaks keep the match
+        assertEquals("mb1", vm.state.value.mbid)
+    }
+
+    @Test
+    fun successKeepsSearchResultsForTheNextPick() {
+        vm.onQuery("radiohead"); vm.search()
+        vm.pick(search.results.single()); vm.submit()
+        assertEquals("radiohead", vm.state.value.query)
+        assertEquals(1, vm.state.value.results.size)
+        assertEquals("", vm.state.value.mbid)
     }
 }

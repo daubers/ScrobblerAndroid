@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.NavHost
 import dev.daubney.scrobbled.data.history.HistoryRepository
 import dev.daubney.scrobbled.data.scrobble.ScrobbleRepository
+import dev.daubney.scrobbled.data.search.TrackSearch
 import dev.daubney.scrobbled.ui.add.AddScreen
 import dev.daubney.scrobbled.ui.add.AddViewModel
 import dev.daubney.scrobbled.ui.history.HistoryScreen
@@ -37,7 +38,7 @@ enum class Destination(val route: String, val label: String) {
 }
 
 @Composable
-fun ScrobbledApp(history: HistoryRepository, scrobbles: ScrobbleRepository, onSignOut: () -> Unit) {
+fun ScrobbledApp(history: HistoryRepository, scrobbles: ScrobbleRepository, trackSearch: TrackSearch, onSignOut: () -> Unit) {
     val nav = rememberNavController()
     val current by nav.currentBackStackEntryAsState()
     Scaffold(
@@ -65,7 +66,7 @@ fun ScrobbledApp(history: HistoryRepository, scrobbles: ScrobbleRepository, onSi
                 HistoryScreen(vm)
             }
             composable(Destination.Add.route) {
-                val vm = viewModel<AddViewModel>(factory = viewModelFactory { initializer { AddViewModel(scrobbles) } })
+                val vm = viewModel<AddViewModel>(factory = viewModelFactory { initializer { AddViewModel(scrobbles, trackSearch) } })
                 AddScreen(vm)
             }
             composable(Destination.Listen.route) { Placeholder(Destination.Listen.label) }

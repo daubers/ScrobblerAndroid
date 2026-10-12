@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ScrobbledTheme {
                 val state by connectVm.state.collectAsState()
-                if (state.connected) ScrobbledApp(app.history, app.scrobbles, onSignOut = connectVm::disconnect) else ConnectScreen(connectVm)
+                if (state.connected) ScrobbledApp(app.history, app.scrobbles, app.trackSearch, onSignOut = connectVm::disconnect) else ConnectScreen(connectVm)
             }
         }
     }
