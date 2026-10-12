@@ -17,6 +17,9 @@ jobs:
           distribution: temurin
           java-version: "21"
       - uses: https://github.com/android-actions/setup-android@v3
+        with:
+          # The default 'tools' package no longer exists; AGP fetches what it needs.
+          packages: ""
       - name: Unit tests
         run: ./gradlew testDebugUnitTest
       - name: Lint
