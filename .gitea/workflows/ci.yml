@@ -1,0 +1,33 @@
+name: CI
+
+# Unit tests, lint and a debug build on every push and PR.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: https://github.com/actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: https://github.com/android-actions/setup-android@v3
+      - uses: https://github.com/gradle/actions/setup-gradle@v4
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
+      - name: Lint
+        run: ./gradlew lintDebug
+      - name: Debug build
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: reports
+          path: |
+            app/build/reports
+            app/build/outputs/apk/debug/*.apk
