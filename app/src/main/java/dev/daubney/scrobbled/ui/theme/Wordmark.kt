@@ -15,6 +15,6 @@ import dev.daubney.scrobbled.R
 @Composable
 fun Wordmark(modifier: Modifier = Modifier, height: Dp = 32.dp) {
     val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    val res = if (dark) R.drawable.wordmark_on_dark else R.drawable.wordmark_on_light
+    val res = if (dark) R.drawable.scrobbled_wordmark_on_dark else R.drawable.scrobbled_wordmark_on_light
     Image(painterResource(res), contentDescription = "Scrobbled", modifier = modifier.height(height))
 }

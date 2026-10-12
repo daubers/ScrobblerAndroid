@@ -9,13 +9,14 @@ import dev.daubney.scrobbled.R
 
 /** Bricolage Grotesque (SIL OFL, see design/OFL.txt): the brand typeface, used for headings and labels. */
 private val Bricolage = FontFamily(
-    Font(R.font.bricolage_grotesque_600, FontWeight.SemiBold),
-    Font(R.font.bricolage_grotesque_800, FontWeight.ExtraBold),
+    Font(R.font.bricolage_grotesque_regular, FontWeight.Normal),
+    Font(R.font.bricolage_grotesque_bold, FontWeight.Bold),
+    Font(R.font.bricolage_grotesque_extrabold, FontWeight.ExtraBold),
 )
 
 private val Base = Typography()
 
-private fun TextStyle.brand() = copy(fontFamily = Bricolage, fontWeight = FontWeight.SemiBold)
+private fun TextStyle.brand() = copy(fontFamily = Bricolage, fontWeight = FontWeight.Bold)
 
 /** Headings and titles use the brand face; body text stays on the system font for legibility. */
 val AppTypography = Base.copy(
