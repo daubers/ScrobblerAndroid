@@ -18,6 +18,9 @@ enum class SubmitResult {
 interface ScrobbleRepository {
     /** Submits one scrobble. Throws if it can't be accepted and isn't worth retrying. */
     suspend fun submit(draft: TrackDraft): SubmitResult
+
+    /** Announces what's playing right now. Not queued: it's only meaningful for a few minutes. */
+    suspend fun setNowPlaying(draft: TrackDraft)
 }
 
 class DefaultScrobbleRepository(
@@ -50,5 +53,17 @@ class DefaultScrobbleRepository(
         // We're online, so this is a good moment to send anything saved earlier.
         if (queue.count() > 0) scheduler.schedule()
         return SubmitResult.Sent
+    }
+
+    override suspend fun setNowPlaying(draft: TrackDraft) {
+        if (draft.artist.isBlank()) throw IllegalArgumentException("Enter an artist")
+        if (draft.track.isBlank()) throw IllegalArgumentException("Enter a track title")
+        val creds = auth.current() ?: throw SessionExpiredException()
+        try {
+            lastFmFor(creds.serverUrl, creds.apiKey, creds.apiSecret)
+                .updateNowPlaying(creds.sessionKey, draft.toScrobbleTrack())
+        } catch (e: LastFmException) {
+            throw if (e.isInvalidSession) SessionExpiredException() else e
+        }
     }
 }

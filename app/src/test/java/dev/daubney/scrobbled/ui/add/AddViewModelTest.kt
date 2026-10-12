@@ -29,6 +29,7 @@ private class FakeScrobbles : ScrobbleRepository {
         submitted += draft
         return result
     }
+    override suspend fun setNowPlaying(draft: TrackDraft) {}
 }
 
 private class FakeSearch : TrackSearch {

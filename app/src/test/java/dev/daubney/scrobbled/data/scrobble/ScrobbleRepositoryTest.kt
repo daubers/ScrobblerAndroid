@@ -127,4 +127,35 @@ class ScrobbleRepositoryTest {
         repo.submit(draft)
         assertEquals(0, scheduler.calls)
     }
+
+    @Test
+    fun setNowPlayingSendsUpdateNowPlayingWithoutQueueing() = runTest {
+        server.enqueue(MockResponse().setBody("""{"nowplaying":{"track":{"#text":"T"}}}"""))
+        repo.setNowPlaying(TrackDraft(artist = "A", track = "T", album = "Al", durationSeconds = 200))
+        val body = URLDecoder.decode(server.takeRequest().body.readUtf8(), "UTF-8")
+        assertTrue(body.contains("method=track.updateNowPlaying"))
+        assertTrue(body.contains("artist=A"))
+        assertTrue(body.contains("duration=200"))
+        assertTrue(body.contains("sk=sess"))
+        assertEquals(0, queue.all.size)
+    }
+
+    @Test
+    fun setNowPlayingDoesNotQueueOnFailure() = runTest {
+        server.enqueue(MockResponse().setResponseCode(502).setBody("<html>bad</html>"))
+        try { repo.setNowPlaying(TrackDraft(artist = "A", track = "T")); fail() } catch (e: LastFmException) { }
+        assertEquals(0, queue.all.size)
+    }
+
+    @Test
+    fun setNowPlayingMapsInvalidSession() = runTest {
+        server.enqueue(MockResponse().setResponseCode(403).setBody("""{"error":9,"message":"Invalid session key"}"""))
+        try { repo.setNowPlaying(TrackDraft(artist = "A", track = "T")); fail() } catch (e: SessionExpiredException) { }
+    }
+
+    @Test
+    fun setNowPlayingNeedsArtistAndTrack() = runTest {
+        try { repo.setNowPlaying(TrackDraft(artist = "A", track = " ")); fail() } catch (e: IllegalArgumentException) { }
+        assertEquals(0, server.requestCount)
+    }
 }
