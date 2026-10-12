@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,9 +26,13 @@ import dev.daubney.scrobbled.ui.home.HomeScreen
 import dev.daubney.scrobbled.ui.home.HomeViewModel
 import dev.daubney.scrobbled.ui.listen.ListenScreen
 import dev.daubney.scrobbled.ui.listen.ListenViewModel
+import dev.daubney.scrobbled.ui.settings.SettingsScreen
+import dev.daubney.scrobbled.ui.settings.SettingsViewModel
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+
+const val SETTINGS_ROUTE = "settings"
 
 enum class Destination(val route: String, val label: String) {
     Home("home", "Home"),
@@ -37,7 +42,7 @@ enum class Destination(val route: String, val label: String) {
 }
 
 @Composable
-fun ScrobbledApp(services: AppServices, onSignOut: () -> Unit) {
+fun ScrobbledApp(services: AppServices, serverUrl: String, username: String, onSignOut: () -> Unit) {
     val nav = rememberNavController()
     val current by nav.currentBackStackEntryAsState()
     Scaffold(
@@ -58,7 +63,7 @@ fun ScrobbledApp(services: AppServices, onSignOut: () -> Unit) {
         NavHost(nav, startDestination = Destination.Home.route, modifier = Modifier.padding(bottom = padding.calculateBottomPadding())) {
             composable(Destination.Home.route) {
                 val vm = viewModel<HomeViewModel>(factory = viewModelFactory { initializer { HomeViewModel(services.history, services.pendingScrobbles) } })
-                HomeScreen(vm, onSignOut)
+                HomeScreen(vm, onSettings = { nav.navigate(SETTINGS_ROUTE) })
             }
             composable(Destination.History.route) {
                 val vm = viewModel<HistoryViewModel>(factory = viewModelFactory { initializer { HistoryViewModel(services.history) } })
@@ -72,7 +77,16 @@ fun ScrobbledApp(services: AppServices, onSignOut: () -> Unit) {
                 val vm = viewModel<ListenViewModel>(
                     factory = viewModelFactory { initializer { ListenViewModel(services.recorder, services.recognizer, services.scrobbles) } },
                 )
-                ListenScreen(vm)
+                val demo by services.recognitionSettings.config.collectAsState()
+                ListenScreen(vm, demoMode = demo?.isComplete != true)
+            }
+            composable(SETTINGS_ROUTE) {
+                val vm = viewModel<SettingsViewModel>(
+                    factory = viewModelFactory {
+                        initializer { SettingsViewModel(serverUrl, username, services.recognitionSettings, services.queue, onSignOut) }
+                    },
+                )
+                SettingsScreen(vm, onBack = { nav.popBackStack() })
             }
         }
     }

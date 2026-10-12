@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
@@ -30,7 +31,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             ScrobbledTheme {
                 val state by connectVm.state.collectAsState()
-                if (state.connected) ScrobbledApp(app.services, onSignOut = connectVm::disconnect) else ConnectScreen(connectVm)
+                LaunchedEffect(Unit) { app.sessionExpired.collect { connectVm.onSessionExpired() } }
+                // After (re)connecting, send anything that queued up while we were signed out.
+                LaunchedEffect(state.connected) { if (state.connected) app.scheduleFlush() }
+                if (state.connected) {
+                    val creds = app.auth.current()
+                    ScrobbledApp(app.services, creds?.serverUrl.orEmpty(), creds?.username.orEmpty(), onSignOut = connectVm::disconnect)
+                } else {
+                    ConnectScreen(connectVm)
+                }
             }
         }
     }

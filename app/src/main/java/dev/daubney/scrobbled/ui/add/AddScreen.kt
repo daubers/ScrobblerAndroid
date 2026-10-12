@@ -47,7 +47,12 @@ fun AddScreen(vm: AddViewModel) {
         Text("Add scrobble", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(16.dp))
         PrimaryTabRow(selectedTabIndex = s.tab.ordinal) {
             AddTab.entries.forEach { t ->
-                Tab(selected = s.tab == t, onClick = { vm.onTab(t) }, text = { Text(if (t == AddTab.Search) "Search" else "Manual") })
+                Tab(
+                    selected = s.tab == t, onClick = { vm.onTab(t) },
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = { Text(if (t == AddTab.Search) "Search" else "Manual") },
+                )
             }
         }
         when (s.tab) {

@@ -27,4 +27,4 @@ data class ScrobblePage(val items: List<RecentScrobble>, val page: Int, val tota
 
 data class Summary(val scrobbles: Int, val artists: Int, val tracks: Int, val firstScrobbleAt: Instant?)
 
-class SessionExpiredException : Exception("Your session has expired. Sign out and sign in again.")
+class SessionExpiredException : Exception("Your session has expired. Please sign in again.")

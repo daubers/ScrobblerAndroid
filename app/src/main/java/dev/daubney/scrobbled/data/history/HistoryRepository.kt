@@ -18,6 +18,8 @@ interface HistoryRepository {
 class DefaultHistoryRepository(
     private val auth: AuthRepository,
     private val apiFor: (String) -> ScrobblerApi = { ScrobblerApi(it) },
+    /** Called when the server rejects the stored token, so the app can ask the user to sign in again. */
+    private val onSessionExpired: () -> Unit = {},
 ) : HistoryRepository {
 
     override suspend fun nowPlaying() = call { api, token -> api.nowPlaying(token) }
@@ -30,7 +32,7 @@ class DefaultHistoryRepository(
             return block(apiFor(creds.serverUrl), creds.bearerToken)
         } catch (e: ApiException) {
             throw when (e.status) {
-                401 -> SessionExpiredException()
+                401 -> SessionExpiredException().also { onSessionExpired() }
                 // Transport failures carry raw exception text ("unexpected end of stream on ..."); say it plainly.
                 -1 -> ApiException(-1, null, "Can't reach the server. Check your connection.")
                 else -> e

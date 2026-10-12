@@ -34,6 +34,9 @@ interface QueueDao {
     @Query("DELETE FROM queued_scrobbles WHERE id IN (:ids)")
     suspend fun delete(ids: List<Long>)
 
+    @Query("DELETE FROM queued_scrobbles")
+    suspend fun clear()
+
     @Query("SELECT COUNT(*) FROM queued_scrobbles")
     suspend fun count(): Int
 
@@ -66,5 +69,6 @@ class RoomQueueStore(private val dao: QueueDao) : QueueStore {
 
     override suspend fun remove(ids: List<Long>) = dao.delete(ids)
     override suspend fun count() = dao.count()
+    override suspend fun clear() = dao.clear()
     override fun observeCount() = dao.observeCount()
 }

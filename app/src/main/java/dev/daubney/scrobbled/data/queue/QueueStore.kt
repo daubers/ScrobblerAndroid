@@ -11,5 +11,8 @@ interface QueueStore {
     suspend fun pending(limit: Int): List<QueuedItem>
     suspend fun remove(ids: List<Long>)
     suspend fun count(): Int
+
+    /** Discards everything, e.g. when signing out of the account the scrobbles belong to. */
+    suspend fun clear()
     fun observeCount(): Flow<Int>
 }

@@ -88,4 +88,18 @@ class ConnectViewModelTest {
         assertFalse(vm.state.value.connected)
         assertNull(auth.stored)
     }
+
+    @Test
+    fun sessionExpiredReturnsToFormKeepingServerAndUsername() {
+        val auth = FakeAuth(Credentials("https://h", "alice", "t", "k", "s", "sk"))
+        val vm = ConnectViewModel(auth)
+        vm.onSessionExpired()
+        val s = vm.state.value
+        assertFalse(s.connected)
+        assertEquals("https://h", s.serverUrl)
+        assertEquals("alice", s.username)
+        assertEquals("", s.password)
+        assertEquals("Your session expired. Sign in again.", s.error)
+        assertNull(auth.stored) // otherwise a restart would drop straight back into the broken session
+    }
 }

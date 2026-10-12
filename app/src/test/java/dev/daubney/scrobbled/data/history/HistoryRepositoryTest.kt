@@ -26,12 +26,13 @@ class HistoryRepositoryTest {
         override fun disconnect() {}
     }
     private lateinit var repo: DefaultHistoryRepository
+    private var expiredCalls = 0
 
     @Before
     fun setUp() {
         server = MockWebServer().also { it.start() }
         creds = Credentials(server.url("/").toString().trimEnd('/'), "alice", "tok", "k", "s", "sk")
-        repo = DefaultHistoryRepository(auth)
+        repo = DefaultHistoryRepository(auth, onSessionExpired = { expiredCalls++ })
     }
 
     @After
@@ -96,6 +97,7 @@ class HistoryRepositoryTest {
     fun unauthorizedBecomesSessionExpired() = runTest {
         server.enqueue(MockResponse().setResponseCode(401).setBody("""{"error":{"code":"unauthorized","message":"no"}}"""))
         try { repo.summary(); fail() } catch (e: SessionExpiredException) { }
+        assertEquals(1, expiredCalls)
     }
 
     @Test

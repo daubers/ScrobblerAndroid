@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +41,7 @@ import dev.daubney.scrobbled.ui.theme.Glow
 import dev.daubney.scrobbled.ui.theme.Panel
 
 @Composable
-fun ListenScreen(vm: ListenViewModel) {
+fun ListenScreen(vm: ListenViewModel, demoMode: Boolean) {
     val s by vm.state.collectAsState()
     val context = LocalContext.current
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -57,6 +58,13 @@ fun ListenScreen(vm: ListenViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text("Listen", style = MaterialTheme.typography.headlineSmall)
+        if (demoMode) {
+            Text(
+                "Demo mode: results are made up. Add your ACRCloud keys in Settings to identify real music.",
+                style = MaterialTheme.typography.labelLarge, color = Glow,
+                modifier = Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(6.dp)).padding(12.dp),
+            )
+        }
         when (s.phase) {
             ListenPhase.Idle -> Idle(s, listen)
             ListenPhase.Recording -> Working("Listening…", s.progress, vm::cancel)

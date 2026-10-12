@@ -14,6 +14,7 @@ class InMemoryQueue : QueueStore {
         items.value.sortedWith(compareBy({ it.draft.playedAt }, { it.id })).take(limit)
     override suspend fun remove(ids: List<Long>) { items.value = items.value.filter { it.id !in ids } }
     override suspend fun count() = items.value.size
+    override suspend fun clear() { items.value = emptyList() }
     override fun observeCount() = items.map { it.size }
 }
 

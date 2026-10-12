@@ -33,7 +33,7 @@ import dev.daubney.scrobbled.ui.theme.PanelText
 private const val POLL_MS = 15_000L
 
 @Composable
-fun HomeScreen(vm: HomeViewModel, onSignOut: () -> Unit) {
+fun HomeScreen(vm: HomeViewModel, onSettings: () -> Unit) {
     val state by vm.state.collectAsState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     // Full refresh on each resume, then poll now-playing every 15s while visible.
@@ -54,7 +54,7 @@ fun HomeScreen(vm: HomeViewModel, onSignOut: () -> Unit) {
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Scrobbled", style = MaterialTheme.typography.headlineSmall)
-                TextButton(onSignOut) { Text("Sign out") }
+                TextButton(onSettings) { Text("Settings") }
             }
         }
         item { NowPlayingPanel(state.nowPlaying) }

@@ -2,6 +2,8 @@ package dev.daubney.scrobbled.ui
 
 import dev.daubney.scrobbled.data.history.HistoryRepository
 import dev.daubney.scrobbled.data.recognition.AudioRecorder
+import dev.daubney.scrobbled.data.queue.QueueStore
+import dev.daubney.scrobbled.data.recognition.RecognitionSettings
 import dev.daubney.scrobbled.data.recognition.Recognizer
 import dev.daubney.scrobbled.data.scrobble.ScrobbleRepository
 import dev.daubney.scrobbled.data.search.TrackSearch
@@ -15,4 +17,6 @@ class AppServices(
     val trackSearch: TrackSearch,
     val recorder: AudioRecorder,
     val recognizer: Recognizer,
+    val recognitionSettings: RecognitionSettings,
+    val queue: QueueStore,
 )

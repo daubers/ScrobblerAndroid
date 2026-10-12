@@ -45,6 +45,17 @@ class ConnectViewModel(private val auth: AuthRepository) : ViewModel() {
         }
     }
 
+    /** The server rejected our token: sign out but keep the server and username so only the password is needed. */
+    fun onSessionExpired() {
+        val c = auth.current()
+        auth.disconnect()
+        _state.value = ConnectState(
+            serverUrl = c?.serverUrl ?: _state.value.serverUrl,
+            username = c?.username ?: _state.value.username,
+            error = "Your session expired. Sign in again.",
+        )
+    }
+
     fun disconnect() {
         auth.disconnect()
         _state.update { it.copy(connected = false, password = "") }
