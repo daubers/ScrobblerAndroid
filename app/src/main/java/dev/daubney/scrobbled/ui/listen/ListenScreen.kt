@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,8 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import dev.daubney.scrobbled.ui.TrackFields
-import dev.daubney.scrobbled.ui.theme.Glow
-import dev.daubney.scrobbled.ui.theme.Panel
+import dev.daubney.scrobbled.ui.theme.AppColors
 
 @Composable
 fun ListenScreen(vm: ListenViewModel, demoMode: Boolean) {
@@ -59,10 +59,12 @@ fun ListenScreen(vm: ListenViewModel, demoMode: Boolean) {
     ) {
         Text("Listen", style = MaterialTheme.typography.headlineSmall)
         if (demoMode) {
+            val panel = AppColors.panel
             Text(
                 "Demo mode: results are made up. Add your ACRCloud keys in Settings to identify real music.",
-                style = MaterialTheme.typography.labelLarge, color = Glow,
-                modifier = Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(6.dp)).padding(12.dp),
+                style = MaterialTheme.typography.labelLarge, color = panel.glow,
+                modifier = Modifier.fillMaxWidth().background(panel.background, RoundedCornerShape(6.dp))
+                    .border(1.dp, panel.edge, RoundedCornerShape(6.dp)).padding(12.dp),
             )
         }
         when (s.phase) {
@@ -89,12 +91,14 @@ private fun Idle(s: ListenState, onListen: () -> Unit) {
 /** A big round button in the web UI's amber-on-dark panel style. */
 @Composable
 private fun ListenButton(onClick: () -> Unit) {
+    val panel = AppColors.panel
     Box(Modifier.fillMaxWidth().padding(vertical = 24.dp), contentAlignment = Alignment.Center) {
         Box(
-            Modifier.size(168.dp).clip(CircleShape).background(Panel).clickable(onClick = onClick),
+            Modifier.size(168.dp).clip(CircleShape).background(panel.background)
+                .border(1.dp, panel.edge, CircleShape).clickable(onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
-            Text("Listen", style = MaterialTheme.typography.titleLarge, color = Glow)
+            Text("Listen", style = MaterialTheme.typography.titleLarge, color = panel.glow)
         }
     }
 }

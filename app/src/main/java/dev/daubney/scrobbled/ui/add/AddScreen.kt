@@ -21,7 +21,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.PrimaryTabRow
@@ -112,8 +111,7 @@ private fun ManualTab(s: AddState, vm: AddViewModel) {
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             WhenOption.entries.forEach { o ->
                 FilterChip(
-                    selected = s.whenOption == o, onClick = { vm.onWhen(o) }, label = { Text(o.label) },
-                    colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.outline),
+                    selected = s.whenOption == o, onClick = { vm.onWhen(o) }, label = { Text(o.label) }
                 )
             }
         }

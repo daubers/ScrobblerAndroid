@@ -1,6 +1,7 @@
 package dev.daubney.scrobbled.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,9 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dev.daubney.scrobbled.data.history.NowPlaying
 import dev.daubney.scrobbled.data.history.Summary
 import dev.daubney.scrobbled.ui.ScrobbleRow
-import dev.daubney.scrobbled.ui.theme.Glow
-import dev.daubney.scrobbled.ui.theme.Panel
-import dev.daubney.scrobbled.ui.theme.PanelText
+import dev.daubney.scrobbled.ui.theme.AppColors
 
 private const val POLL_MS = 15_000L
 
@@ -63,7 +62,7 @@ fun HomeScreen(vm: HomeViewModel, onSettings: () -> Unit) {
             item {
                 Text(
                     if (state.pending == 1) "1 scrobble waiting to send" else "${state.pending} scrobbles waiting to send",
-                    color = Glow, style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge,
                 )
             }
         }
@@ -80,17 +79,19 @@ fun HomeScreen(vm: HomeViewModel, onSettings: () -> Unit) {
 /** The dark "hi-fi front panel" from the web UI, glowing amber while something plays. */
 @Composable
 private fun NowPlayingPanel(np: NowPlaying?) {
+    val panel = AppColors.panel
     Column(
-        Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(14.dp)).padding(20.dp),
+        Modifier.fillMaxWidth().background(panel.background, RoundedCornerShape(14.dp))
+            .border(1.dp, panel.edge, RoundedCornerShape(14.dp)).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Text(if (np != null) "NOW PLAYING" else "NOTHING PLAYING", style = MaterialTheme.typography.labelMedium, color = PanelText)
+        Text(if (np != null) "NOW PLAYING" else "NOTHING PLAYING", style = MaterialTheme.typography.labelMedium, color = panel.text)
         if (np != null) {
-            Text(np.track, style = MaterialTheme.typography.titleLarge, color = Glow)
-            Text(np.artist, style = MaterialTheme.typography.bodyLarge, color = Glow)
-            np.album?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = PanelText) }
+            Text(np.track, style = MaterialTheme.typography.titleLarge, color = panel.glow)
+            Text(np.artist, style = MaterialTheme.typography.bodyLarge, color = panel.glow)
+            np.album?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = panel.text) }
         } else {
-            Text("—", style = MaterialTheme.typography.titleLarge, color = PanelText)
+            Text("—", style = MaterialTheme.typography.titleLarge, color = panel.text)
         }
     }
 }
