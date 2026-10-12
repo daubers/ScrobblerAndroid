@@ -24,6 +24,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import dev.daubney.scrobbled.ui.ScrobbleRow
 
 private const val PREFETCH = 10
@@ -33,6 +36,12 @@ private const val PREFETCH = 10
 fun HistoryScreen(vm: HistoryViewModel) {
     val state by vm.state.collectAsState()
     val listState = rememberLazyListState()
+
+    // Returning to the tab (e.g. after adding a scrobble) reloads from the top; the first visit is handled below.
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(lifecycle, vm) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) { if (vm.state.value.items.isNotEmpty()) vm.refresh() }
+    }
 
     // Load more when within PREFETCH rows of the end (also covers the very first load).
     LaunchedEffect(listState, vm) {

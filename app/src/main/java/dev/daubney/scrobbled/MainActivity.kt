@@ -26,11 +26,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        val history = (application as ScrobbledApplication).history
+        val app = application as ScrobbledApplication
         setContent {
             ScrobbledTheme {
                 val state by connectVm.state.collectAsState()
-                if (state.connected) ScrobbledApp(history, onSignOut = connectVm::disconnect) else ConnectScreen(connectVm)
+                if (state.connected) ScrobbledApp(app.history, app.scrobbles, onSignOut = connectVm::disconnect) else ConnectScreen(connectVm)
             }
         }
     }
