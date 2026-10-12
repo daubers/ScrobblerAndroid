@@ -1,6 +1,7 @@
 package dev.daubney.scrobbled.ui.add
 
 import dev.daubney.scrobbled.data.scrobble.ScrobbleRepository
+import dev.daubney.scrobbled.data.scrobble.SubmitResult
 import dev.daubney.scrobbled.data.scrobble.TrackDraft
 import dev.daubney.scrobbled.data.search.SearchException
 import dev.daubney.scrobbled.data.search.TrackResult
@@ -22,9 +23,11 @@ import java.time.Instant
 private class FakeScrobbles : ScrobbleRepository {
     val submitted = mutableListOf<TrackDraft>()
     var failure: Exception? = null
-    override suspend fun submit(draft: TrackDraft) {
+    var result = SubmitResult.Sent
+    override suspend fun submit(draft: TrackDraft): SubmitResult {
         failure?.let { throw it }
         submitted += draft
+        return result
     }
 }
 
@@ -180,5 +183,13 @@ class AddViewModelTest {
         assertEquals("radiohead", vm.state.value.query)
         assertEquals(1, vm.state.value.results.size)
         assertEquals("", vm.state.value.mbid)
+    }
+
+    @Test
+    fun queuedSubmitSaysItWillBeSentLater() {
+        repo.result = SubmitResult.Queued
+        fill(); vm.submit()
+        assertEquals("Saved Reckoner. It will be sent when you're back online.", vm.state.value.message)
+        assertEquals("", vm.state.value.track) // form clears: the scrobble is safely stored
     }
 }

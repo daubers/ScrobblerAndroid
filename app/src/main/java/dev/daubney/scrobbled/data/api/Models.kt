@@ -20,4 +20,7 @@ data class ScrobbleResult(val accepted: Int, val ignored: Int)
 class LastFmException(val code: Int, message: String) : Exception(message) {
     /** The session key was rejected; the user must re-authenticate. */
     val isInvalidSession get() = code == 9
+
+    /** Worth retrying later: no connection / bad gateway (-1), server hiccup (8) or rate limiting (29). */
+    val isTransient get() = code == -1 || code == 8 || code == 29
 }

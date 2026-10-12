@@ -3,6 +3,7 @@ package dev.daubney.scrobbled.ui.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.daubney.scrobbled.data.scrobble.ScrobbleRepository
+import dev.daubney.scrobbled.data.scrobble.SubmitResult
 import dev.daubney.scrobbled.data.scrobble.TrackDraft
 import dev.daubney.scrobbled.data.search.SearchException
 import dev.daubney.scrobbled.data.search.TrackResult
@@ -106,12 +107,16 @@ class AddViewModel(
         _state.update { it.copy(submitting = true, error = null, message = null) }
         viewModelScope.launch {
             try {
-                scrobbles.submit(draft)
+                val outcome = scrobbles.submit(draft)
                 // Keep the time choice and search (adding several tracks in a row is common), clear the form.
                 _state.update {
                     it.copy(
                         artist = "", track = "", album = "", mbid = "", durationSeconds = null,
-                        submitting = false, message = "Scrobbled ${draft.track.trim()}",
+                        submitting = false,
+                        message = when (outcome) {
+                            SubmitResult.Sent -> "Scrobbled ${draft.track.trim()}"
+                            SubmitResult.Queued -> "Saved ${draft.track.trim()}. It will be sent when you're back online."
+                        },
                     )
                 }
             } catch (e: Exception) {
