@@ -8,6 +8,14 @@ Last.fm-compatible scrobbling server. With it you can:
 - **See** what you're listening to now, your totals, and your scrobble history.
 - **Scrobble offline**: scrobbles made without a connection are saved on the device and sent automatically later.
 
+<p>
+  <img src="docs/screenshots/light/02-home.png" alt="Home screen, light theme" width="240">
+  <img src="docs/screenshots/dark/02-home.png" alt="Home screen, dark theme" width="240">
+  <img src="docs/screenshots/light/04-listen-confirm.png" alt="Listen confirmation screen" width="240">
+</p>
+
+See the [user guide](docs/user-guide.md) for how to use each screen.
+
 The app follows the system light/dark setting and uses the Scrobbled brand palette, wordmark and Bricolage Grotesque typeface from [ScrobbledDesign](https://git.daubney.dev/matt/ScrobbledDesign) (artwork licence and font licence in `design/`).
 
 ## Requirements
